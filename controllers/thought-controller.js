@@ -67,6 +67,10 @@ const thoughtController = {
       })
       .catch((err) => res.json(err));
   },
+  // get all reactions
+  getReactions({ params, body }, res) {
+    Thought.findOneAndUpdate(body);
+  },
 };
 
 module.exports = thoughtController;
