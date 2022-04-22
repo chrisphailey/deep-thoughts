@@ -3,8 +3,8 @@ const { Thought, User } = require("../models");
 const thoughtController = {
   // get all thoughts
   getAllThoughts(req, res) {
+    console.log("working");
     Thought.find({})
-      .select("-__v")
       .then((dbThoughtData) => res.json(dbThoughtData))
       .catch((err) => {
         console.log(err);
@@ -13,8 +13,7 @@ const thoughtController = {
   },
   //   get single thought
   getThoughtById({ params }, res) {
-    Thought.findOne({ _id: params.id })
-      .select("-__v")
+    Thought.findOne({ _id: params.thoughtId })
       .then((dbThoughtData) => res.json(dbThoughtData))
       .catch((err) => {
         console.log(err);
@@ -50,7 +49,7 @@ const thoughtController = {
       })
       .then((ThoughtData) => {
         if (!ThoughtData) {
-          res.status(404).json({ message: "No User found with this id" });
+          res.status(404).json({ message: "No thought found with this id" });
         }
         res.json(ThoughtData);
       })
@@ -58,7 +57,7 @@ const thoughtController = {
   },
   // delete thought
   deleteThought({ params }, res) {
-    Thought.findOneAndDelete({ _id: params.id })
+    Thought.findOneAndDelete({ _id: params.thoughtId })
       .then((deletedData) => {
         if (!deletedData) {
           res.status(404).json({ message: "No thought found with this ID" });
@@ -67,9 +66,33 @@ const thoughtController = {
       })
       .catch((err) => res.json(err));
   },
-  // get all reactions
-  getReactions({ params, body }, res) {
-    Thought.findOneAndUpdate(body);
+  addReaction({ params, body }, res) {
+    Thought.findOneAndUpdate(
+      { _id: params.thoughtId },
+      { $push: { reactions: body } },
+      { new: true, runValidators: true }
+    )
+      .then((addedReaction) => {
+        if (!addedReaction) {
+          return res.status(404).json({ message: "No thought with this id!" });
+        }
+        res.json(addedReaction);
+      })
+      .catch((err) => res.json(err));
+  },
+  deleteReaction({ params }, res) {
+    Thought.findOneAndUpdate(
+      { _id: params.thoughtId },
+      { $pull: { reactions: { reactionId: params.reactionId } } },
+      { new: true }
+    )
+      .then((deletedReaction) => {
+        if (!deletedReaction) {
+          res.status(404).json({ message: "No reaction exists with this id" });
+        }
+        res.json(deletedReaction);
+      })
+      .catch((err) => res.status(500).json(err));
   },
 };
 

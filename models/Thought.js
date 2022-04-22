@@ -22,24 +22,33 @@ const ReactionSchema = new Schema({
   },
 });
 
-const ThoughtSchema = new Schema({
-  thoughtText: {
-    type: String,
-    required: true,
-    minLength: 1,
-    maxLength: 280,
+const ThoughtSchema = new Schema(
+  {
+    thoughtText: {
+      type: String,
+      required: true,
+      minLength: 1,
+      maxLength: 280,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      get: (date) => dateFormat(date),
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    reactions: [ReactionSchema],
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    get: (date) => dateFormat(date),
-  },
-  username: {
-    type: String,
-    required: true,
-  },
-  reactions: [ReactionSchema],
-});
+  {
+    toJSON: {
+      virtuals: true,
+      getters: true,
+    },
+    id: false,
+  }
+);
 
 ThoughtSchema.virtual("reactionCount").get(function () {
   return this.reactions.length;

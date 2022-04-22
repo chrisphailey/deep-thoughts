@@ -19,6 +19,7 @@
   "homepage": "https://github.com/chrisphailey/deep-thoughts#readme",
   "dependencies": {
     "express": "^4.17.3",
-    "mongoose": "^6.3.0"
+    "mongoose": "^6.3.0",
+    "routes": "^2.1.0"
   }
 }
